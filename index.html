@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Gobierno del TCoE · Simulación Ejecutiva — Comité de Arquitectura Organizacional</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Manrope:wght@300;400;500;600;700;800&family=Fragment+Mono&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#070b22;
+    --navy:#0f1638;
+    --navy2:#1a2250;
+    --navy3:#232c5e;
+    --gold:#e0ad44;
+    --gold-deep:#b98a2e;
+    --gold-soft:#f6ecd6;
+    --teal:#46bcb1;
+    --teal-deep:#2c7a73;
+    --rose:#e0795f;
+    --conn:rgba(224,173,68,.5);
+    --txt:#eef1fb;
+    --txt2:#b3bbd6;
+    --txt3:#7b85a6;
+    --line:rgba(255,255,255,.10);
+    --line2:rgba(255,255,255,.16);
+    --card:rgba(255,255,255,.035);
+    --card2:rgba(255,255,255,.06);
+    --glass:rgba(8,13,38,.62);
+    --serif:'Cormorant Garamond',Georgia,serif;
+    --sans:'Manrope',system-ui,sans-serif;
+    --mono:'Fragment Mono',ui-monospace,monospace;
+    --r:18px;
+    --maxw:1180px;
+    --ease:cubic-bezier(.2,.7,.2,1);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth;overflow-x:hidden}
+  body{font-family:var(--sans);color:var(--txt);background:var(--ink);line-height:1.55;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+  ::selection{background:rgba(224,173,68,.3);color:#fff}
+  a{color:inherit}
+
+  /* ===== ATMOSPHERE ===== */
+  .bg{position:fixed;inset:0;z-index:-3;overflow:hidden;background:
+      radial-gradient(1300px 760px at 82% -12%, rgba(224,173,68,.13), transparent 60%),
+      radial-gradient(1000px 640px at -12% 112%, rgba(70,188,177,.12), transparent 60%),
+      linear-gradient(160deg,#070b22 0%, #0f1638 52%, #090e29 100%);}
+  .grid{position:fixed;inset:0;z-index:-2;opacity:.35;
+    background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+    background-size:64px 64px;-webkit-mask-image:radial-gradient(circle at 50% 24%, #000 0%, transparent 72%);mask-image:radial-gradient(circle at 50% 24%, #000 0%, transparent 72%);}
+  .orb{position:fixed;border-radius:50%;filter:blur(72px);opacity:.5;z-index:-2;animation:float 20s ease-in-out infinite;will-change:transform}
+  .orb.a{width:460px;height:460px;background:rgba(224,173,68,.16);top:-130px;right:-90px}
+  .orb.b{width:400px;height:400px;background:rgba(70,188,177,.14);bottom:-130px;left:-70px;animation-delay:-8s}
+  @keyframes float{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,-38px)}}
+  #stars{position:fixed;inset:0;z-index:-2;pointer-events:none}
+
+  /* ===== PROGRESS + TOPBAR ===== */
+  .progress{position:fixed;top:0;left:0;height:3px;width:0;z-index:90;background:linear-gradient(90deg,var(--gold),var(--teal));box-shadow:0 0 16px rgba(224,173,68,.6)}
+  .topbar{position:fixed;top:0;left:0;right:0;z-index:80;display:flex;align-items:center;justify-content:space-between;
+    padding:15px 30px;backdrop-filter:blur(14px);background:linear-gradient(180deg,rgba(7,11,34,.85),rgba(7,11,34,0));
+    transform:translateY(-110%);transition:transform .5s var(--ease);border-bottom:1px solid transparent}
+  .topbar.show{transform:none;border-bottom-color:var(--line)}
+  .topbar .brand{display:flex;align-items:center;gap:11px;font-weight:700;font-size:.84rem;text-decoration:none}
+  .topbar .brand .mk{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-family:var(--serif);font-weight:700;font-size:1.05rem;
+    color:#1a1405;background:linear-gradient(135deg,var(--gold),var(--gold-deep));box-shadow:0 6px 18px rgba(224,173,68,.35)}
+  .topbar .brand .sub{color:var(--txt3);font-weight:500;font-size:.78rem}
+  .topbar .tnav{display:flex;gap:3px}
+  .topbar .tnav a{font-size:.8rem;font-weight:600;color:var(--txt2);text-decoration:none;padding:8px 13px;border-radius:100px;transition:.25s}
+  .topbar .tnav a:hover{color:var(--txt);background:var(--card2)}
+  .topbar .tnav a.active{color:var(--gold);background:rgba(224,173,68,.1)}
+  .topbar .tcta{font-size:.8rem;font-weight:700;color:#1a1405;text-decoration:none;padding:9px 18px;border-radius:100px;background:linear-gradient(135deg,var(--gold),var(--gold-deep))}
+  @media(max-width:980px){.topbar .tnav,.topbar .tcta{display:none}}
+
+  /* ===== SIDE DOTS ===== */
+  .dots{position:fixed;right:22px;top:50%;transform:translateY(-50%);z-index:70;display:flex;flex-direction:column;gap:15px;opacity:0;transition:opacity .5s}
+  .dots.show{opacity:1}
+  .dots a{position:relative;width:11px;height:11px;border-radius:50%;border:1.5px solid var(--line2);transition:.3s;display:block;cursor:pointer}
+  .dots a:hover{border-color:var(--gold);transform:scale(1.25)}
+  .dots a.active{background:var(--gold);border-color:var(--gold);box-shadow:0 0 12px rgba(224,173,68,.7)}
+  .dots a::after{content:attr(data-l);position:absolute;right:24px;top:50%;transform:translateY(-50%) translateX(8px);white-space:nowrap;
+    font-size:.72rem;font-weight:600;color:var(--txt2);opacity:0;pointer-events:none;transition:.3s;background:rgba(7,11,34,.92);padding:5px 11px;border-radius:7px;border:1px solid var(--line)}
+  .dots a:hover::after{opacity:1;transform:translateY(-50%) translateX(0)}
+  @media(max-width:980px){.dots{display:none}}
+
+  /* ===== LAYOUT ===== */
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 30px}
+  section{padding:100px 0;position:relative}
+  .eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:.74rem;letter-spacing:.32em;text-transform:uppercase;font-weight:700;color:var(--gold);margin-bottom:18px}
+  .eyebrow::before{content:"";width:26px;height:1px;background:linear-gradient(90deg,var(--gold),transparent)}
+  .eyebrow.teal{color:var(--teal)}.eyebrow.teal::before{background:linear-gradient(90deg,var(--teal),transparent)}
+  h1,h2{font-family:var(--serif);font-weight:600;line-height:1.04;letter-spacing:-.5px;overflow-wrap:break-word}
+  h2{font-size:clamp(2.1rem,4.6vw,3.4rem);margin-bottom:18px}
+  h2 .em{color:var(--gold);font-style:italic}
+  .lead{font-size:clamp(1.02rem,1.6vw,1.2rem);color:var(--txt2);max-width:700px}
+
+  /* reveal */
+  .rv{opacity:0;transform:translateY(28px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
+  .rv.in{opacity:1;transform:none}
+  .rv.d1{transition-delay:.09s}.rv.d2{transition-delay:.18s}.rv.d3{transition-delay:.27s}.rv.d4{transition-delay:.36s}.rv.d5{transition-delay:.45s}
+
+  /* ===== HERO ===== */
+  .hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding-top:70px;padding-bottom:60px}
+  .hero .tag{display:inline-flex;align-items:center;flex-wrap:wrap;gap:10px;font-size:.72rem;letter-spacing:.26em;text-transform:uppercase;
+    color:var(--gold);font-weight:700;border:1px solid var(--line);border-radius:100px;padding:10px 17px;max-width:100%;line-height:1.5;background:var(--card)}
+  .hero .tag .dot{width:7px;height:7px;border-radius:50%;background:var(--teal);box-shadow:0 0 10px var(--teal);animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  .hero h1{font-size:clamp(2.6rem,6.2vw,5rem);line-height:1.08;margin:26px 0 28px;max-width:17ch;
+    opacity:0;transform:translateY(34px);animation:heroUp 1s var(--ease) .25s forwards}
+  .hero h1 .em{color:var(--gold);font-style:italic}
+  @keyframes heroUp{to{opacity:1;transform:none}}
+  .hero p.sub{font-size:clamp(1.05rem,1.8vw,1.34rem);color:var(--txt2);max-width:660px;opacity:0;animation:fadeIn 1s ease .85s forwards}
+  @keyframes fadeIn{to{opacity:1}}
+  .cta-row{display:flex;gap:14px;flex-wrap:wrap;margin-top:40px;opacity:0;animation:fadeIn 1s ease 1.05s forwards}
+  .btn{font-family:var(--sans);font-weight:700;font-size:.95rem;border:none;cursor:pointer;border-radius:100px;
+    padding:16px 30px;transition:transform .25s,box-shadow .25s,background .25s;text-decoration:none;display:inline-flex;align-items:center;gap:10px}
+  .btn.primary{background:linear-gradient(135deg,var(--gold),var(--gold-deep));color:#1a1405;box-shadow:0 12px 34px rgba(224,173,68,.32)}
+  .btn.primary:hover{transform:translateY(-3px);box-shadow:0 18px 46px rgba(224,173,68,.46)}
+  .btn.ghost{background:var(--card2);color:var(--txt);border:1px solid var(--line)}
+  .btn.ghost:hover{transform:translateY(-3px);background:rgba(255,255,255,.1)}
+  .hero-meta{margin-top:70px;display:flex;flex-wrap:wrap;opacity:0;animation:fadeIn 1s ease 1.25s forwards}
+  .hero-meta .hm{padding:0 34px;border-left:1px solid var(--line)}
+  .hero-meta .hm:first-child{padding-left:0;border-left:none}
+  .hero-meta .k{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--txt3);font-weight:700;margin-bottom:7px}
+  .hero-meta .v{font-family:var(--serif);font-size:1.8rem;font-weight:700;color:var(--txt)}
+  .hero-meta .v .g{color:var(--gold)}.hero-meta .v .t{color:var(--teal)}
+  .scrollcue{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:9px;
+    color:var(--txt3);font-size:.66rem;letter-spacing:.24em;text-transform:uppercase;opacity:0;animation:fadeIn 1s ease 1.5s forwards}
+  .scrollcue .ln{width:1px;height:36px;background:linear-gradient(var(--gold),transparent);animation:cueDrop 1.8s ease-in-out infinite}
+  @keyframes cueDrop{0%,100%{transform:scaleY(.4);opacity:.4;transform-origin:top}50%{transform:scaleY(1);opacity:1;transform-origin:top}}
+
+  /* ===== TIMELINE ===== */
+  .tl{position:relative;margin-top:46px;padding-left:0}
+  .tl-track{position:absolute;left:21px;top:8px;bottom:8px;width:2px;background:linear-gradient(var(--teal),var(--gold))}
+  .tl-track .fill{position:absolute;left:0;top:0;width:100%;height:0;background:var(--gold);box-shadow:0 0 12px var(--gold);transition:height 1.2s var(--ease)}
+  .tl-step{position:relative;padding:0 0 40px 62px;cursor:pointer}
+  .tl-step:last-child{padding-bottom:0}
+  .tl-dot{position:absolute;left:11px;top:2px;width:22px;height:22px;border-radius:50%;background:var(--navy2);border:2px solid var(--line2);
+    display:grid;place-items:center;transition:.4s;z-index:2}
+  .tl-dot::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--txt3);transition:.4s}
+  .tl-step.on .tl-dot{border-color:var(--gold);box-shadow:0 0 0 6px rgba(224,173,68,.12)}
+  .tl-step.on .tl-dot::after{background:var(--gold);box-shadow:0 0 10px var(--gold)}
+  .tl-yr{font-family:var(--mono);font-size:.74rem;letter-spacing:.12em;color:var(--gold);font-weight:400;margin-bottom:5px;text-transform:uppercase}
+  .tl-step.teal.on .tl-dot{border-color:var(--teal);box-shadow:0 0 0 6px rgba(70,188,177,.12)}
+  .tl-step.teal.on .tl-dot::after{background:var(--teal);box-shadow:0 0 10px var(--teal)}
+  .tl-step.teal .tl-yr{color:var(--teal)}
+  .tl-h{font-family:var(--serif);font-size:1.5rem;font-weight:600;line-height:1.12;margin-bottom:7px;transition:.3s}
+  .tl-step:not(.on) .tl-h{color:var(--txt2)}
+  .tl-body{max-height:0;overflow:hidden;opacity:0;transition:max-height .5s var(--ease),opacity .5s var(--ease)}
+  .tl-step.on .tl-body{max-height:340px;opacity:1;margin-top:6px}
+  .tl-body p{color:var(--txt2);font-size:1.01rem;max-width:620px}
+  .tl-body .badge{display:inline-flex;align-items:center;gap:7px;margin-top:13px;font-size:.74rem;font-weight:700;letter-spacing:.06em;
+    padding:6px 13px;border-radius:100px;background:rgba(224,173,68,.12);color:var(--gold);border:1px solid rgba(224,173,68,.3)}
+  .tl-step.teal .tl-body .badge{background:rgba(70,188,177,.12);color:var(--teal);border-color:rgba(70,188,177,.3)}
+
+  /* ===== ORG CHART ===== */
+  .org-ctl{display:inline-flex;background:var(--card);border:1px solid var(--line);border-radius:100px;padding:5px;margin-top:30px}
+  .org-ctl button{font-family:var(--sans);font-weight:600;font-size:.9rem;color:var(--txt2);background:none;border:none;cursor:pointer;padding:11px 22px;border-radius:100px;transition:.3s;white-space:nowrap}
+  .org-ctl button.on{color:#1a1405;background:linear-gradient(135deg,var(--gold),var(--gold-deep))}
+  .org-ctl button.on.teal-on{background:linear-gradient(135deg,var(--teal),var(--teal-deep));color:#04201d}
+
+  .org-stage{position:relative;margin-top:34px;display:grid;grid-template-columns:1.4fr .9fr;gap:24px;align-items:start}
+  @media(max-width:900px){.org-stage{grid-template-columns:1fr}}
+  .orgtree{position:relative;min-height:430px}
+  .orgflow{position:relative;opacity:0;transform:translateY(10px);transition:opacity .45s var(--ease),transform .45s var(--ease)}
+  .orgflow.show{opacity:1;transform:none}
+  .orgobj{display:flex;justify-content:center;margin-bottom:6px}
+  .orgobj .pill{display:inline-flex;align-items:center;gap:9px;font-size:.74rem;font-weight:700;letter-spacing:.04em;padding:9px 16px;border-radius:100px;text-align:center}
+  .orgflow.after .orgobj .pill{color:var(--teal);background:rgba(70,188,177,.1);border:1px solid rgba(70,188,177,.32)}
+  .orgflow.hoy .orgobj .pill{color:var(--rose);background:rgba(224,121,95,.1);border:1px solid rgba(224,121,95,.34)}
+  .orgobj .pill svg{width:15px;height:15px;flex:none}
+
+  .orghead{display:flex;justify-content:center;margin-top:14px}
+  .trunk{width:2px;height:30px;background:var(--conn);margin:0 auto}
+  .arms{display:grid;grid-template-columns:1fr 1fr;gap:30px;position:relative;padding-top:30px}
+  .arms::before{content:"";position:absolute;top:0;left:25%;right:25%;height:2px;background:var(--conn)}
+  .acell{display:flex;flex-direction:column;align-items:center;position:relative}
+  .acell::before{content:"";position:absolute;top:-30px;left:50%;transform:translateX(-50%);width:2px;height:30px;background:var(--conn)}
+  .vbar{width:2px;height:26px;background:var(--conn);margin:0 auto}
+  .orgflow.hoy .trunk,.orgflow.hoy .arms::before,.orgflow.hoy .acell::before{display:none}
+  .orgflow.hoy .acell{padding-top:0}
+  .orgflow.hoy .vbar{background:rgba(224,121,95,.55)}
+
+  .onode{display:inline-block;border:1px solid var(--line);border-radius:14px;background:var(--card2);padding:15px 20px;backdrop-filter:blur(6px);min-width:220px;max-width:300px;
+    cursor:pointer;transition:transform .35s var(--ease),box-shadow .35s,border-color .35s,background .35s,opacity .35s;text-align:left}
+  .onode:hover{transform:translateY(-4px);border-color:rgba(224,173,68,.5)}
+  .onode.sel{border-color:var(--gold);box-shadow:0 0 0 3px rgba(224,173,68,.18),0 16px 40px rgba(0,0,0,.35)}
+  .onode .lab{font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;font-weight:700;margin-bottom:5px;color:var(--txt3)}
+  .onode .t{font-family:var(--serif);font-size:1.28rem;font-weight:600;line-height:1.12}
+  .onode .d{font-size:.84rem;color:var(--txt3);margin-top:5px}
+  .onode.top{background:linear-gradient(135deg,var(--gold),var(--gold-deep));color:#1a1405;border:none;box-shadow:0 14px 40px rgba(224,173,68,.3);min-width:260px}
+  .onode.top .lab{color:rgba(26,20,5,.62)}.onode.top .t{font-size:1.45rem;font-weight:700}
+  .onode.proc{border-color:rgba(70,188,177,.5)}.onode.proc .lab{color:var(--teal)}
+  .onode.oper{border-color:rgba(224,173,68,.5)}.onode.oper .lab{color:var(--gold)}
+  .onode.dev{border-style:dashed;border-color:rgba(224,121,95,.6);background:rgba(224,121,95,.08)}
+  .onode.dev .lab{color:var(--rose)}.onode.dev .t{font-size:1.18rem}
+  .ghosthead{display:flex;justify-content:center;align-items:center;gap:10px;text-align:center;margin:14px auto 2px;max-width:520px;
+    border:1px dashed rgba(224,121,95,.45);border-radius:14px;padding:14px 20px;color:var(--rose);font-size:.9rem;font-weight:600;background:rgba(224,121,95,.05)}
+  .ghosthead svg{width:20px;height:20px;flex:none}
+  .ntag{display:inline-flex;align-items:center;gap:6px;margin-top:10px;font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    padding:5px 11px;border-radius:100px;line-height:1.3}
+  .ntag.pain{color:var(--rose);background:rgba(224,121,95,.12);border:1px solid rgba(224,121,95,.3)}
+  .ntag.gain{color:var(--teal);background:rgba(70,188,177,.12);border:1px solid rgba(70,188,177,.32)}
+
+  .orgsum{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:30px}
+  .scard{border:1px solid var(--line);border-radius:14px;padding:18px 18px 16px;background:var(--card);transition:.4s}
+  .scard .sh{display:flex;align-items:center;gap:9px;font-size:.7rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin-bottom:9px}
+  .scard .sh .si{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;flex:none}
+  .scard .sh .si svg{width:15px;height:15px}
+  .scard p{font-size:.9rem;color:var(--txt2);line-height:1.45}
+  .scard.bad .sh{color:var(--rose)}.scard.bad .sh .si{background:rgba(224,121,95,.14);color:var(--rose)}
+  .scard.bad{border-color:rgba(224,121,95,.25)}
+  .scard.good .sh{color:var(--teal)}.scard.good .sh .si{background:rgba(70,188,177,.14);color:var(--teal)}
+  .scard.good{border-color:rgba(70,188,177,.28)}
+  @media(max-width:760px){.orgsum{grid-template-columns:1fr}}
+
+  .org-detail{border:1px solid var(--line);border-radius:var(--r);background:var(--card);padding:26px;position:sticky;top:90px;min-height:230px;transition:.4s}
+  .org-detail .dl{font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;font-weight:700;color:var(--gold);margin-bottom:10px}
+  .org-detail h4{font-family:var(--serif);font-size:1.5rem;font-weight:600;margin-bottom:10px;line-height:1.1}
+  .org-detail p{color:var(--txt2);font-size:.96rem;margin-bottom:14px}
+  .org-detail ul{list-style:none;display:grid;gap:9px}
+  .org-detail li{padding-left:22px;position:relative;color:var(--txt2);font-size:.92rem}
+  .org-detail li::before{content:"";position:absolute;left:0;top:8px;width:7px;height:7px;border-radius:50%;background:var(--b,var(--gold))}
+  .org-detail .hint{margin-top:6px;font-size:.8rem;color:var(--txt3);font-style:italic}
+
+  /* problem cards */
+  .three{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:34px}
+  .tcard{border:1px solid var(--line);border-radius:var(--r);padding:26px;background:var(--card);transition:.35s}
+  .tcard:hover{transform:translateY(-6px);border-color:rgba(224,173,68,.4);background:var(--card2)}
+  .tcard .ic{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;background:rgba(224,173,68,.14);color:var(--gold);margin-bottom:16px}
+  .tcard h4{font-family:var(--serif);font-size:1.3rem;font-weight:600;margin-bottom:6px}
+  .tcard p{color:var(--txt3);font-size:.92rem}
+  .tcard svg{width:22px;height:22px}
+
+  /* ===== SIMULATOR ===== */
+  .sim{border:1px solid var(--line);border-radius:24px;background:var(--glass);backdrop-filter:blur(12px);padding:30px;margin-top:34px;box-shadow:0 30px 80px rgba(0,0,0,.4)}
+  .sim-head{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;flex-wrap:wrap;margin-bottom:8px}
+  .sim-head .live{display:inline-flex;align-items:center;gap:8px;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--teal);font-weight:700}
+  .sim-head .live .dot{width:8px;height:8px;border-radius:50%;background:var(--teal);box-shadow:0 0 10px var(--teal);animation:pulse 1.6s infinite}
+  .sim-head .ctr{display:flex;gap:10px;align-items:center}
+  .sim-head .ctr .meta{font-family:var(--mono);font-size:.72rem;color:var(--txt3)}
+  .sim p.hint{color:var(--txt3);font-size:.92rem;margin-bottom:20px}
+  .chips{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+  .chip{font-family:var(--sans);font-weight:600;font-size:.86rem;color:var(--txt2);cursor:pointer;border:1px solid var(--line);background:var(--card);
+    border-radius:100px;padding:11px 17px;transition:.25s;display:flex;align-items:center;gap:9px}
+  .chip:hover{border-color:rgba(224,173,68,.5);color:var(--txt);transform:translateY(-2px)}
+  .chip.on{background:linear-gradient(135deg,var(--gold),var(--gold-deep));color:#1a1405;border-color:transparent}
+  .chip .tg{font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;font-weight:800;opacity:.85}
+
+  .railwrap{margin-top:24px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.02);overflow:hidden}
+  .rail{display:flex;align-items:stretch;border-bottom:1px solid var(--line)}
+  .rail .rstep{flex:1;padding:13px 14px;text-align:center;position:relative;transition:.4s;border-right:1px solid var(--line)}
+  .rail .rstep:last-child{border-right:none}
+  .rail .rstep .rn{font-family:var(--mono);font-size:.68rem;color:var(--txt3);transition:.3s}
+  .rail .rstep .rt{font-size:.78rem;font-weight:700;color:var(--txt3);margin-top:3px;transition:.3s}
+  .rail .rstep.done{background:rgba(70,188,177,.07)}
+  .rail .rstep.done .rn,.rail .rstep.done .rt{color:var(--teal)}
+  .rail .rstep.active{background:rgba(224,173,68,.1)}
+  .rail .rstep.active .rn,.rail .rstep.active .rt{color:var(--gold)}
+  .rail .rstep .bar{position:absolute;left:0;bottom:0;height:2px;width:0;background:var(--gold);transition:width .5s linear}
+  .rail .rstep.active .bar{width:100%}
+  .rail .rstep.done .bar{width:100%;background:var(--teal)}
+
+  .stage{padding:18px;display:grid;gap:13px;min-height:120px}
+  .empty{border:1px dashed var(--line);border-radius:14px;padding:46px 24px;text-align:center;color:var(--txt3)}
+  .empty .big{font-size:2.2rem;margin-bottom:10px;opacity:.5}
+  .empty .big svg{width:46px;height:46px}
+
+  .step{display:flex;gap:16px;align-items:flex-start;border:1px solid var(--line);border-radius:14px;padding:16px 18px;background:var(--card);
+    opacity:0;transform:translateX(-18px);transition:.55s var(--ease)}
+  .step.show{opacity:1;transform:none}
+  .step .num{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:.85rem;
+    background:rgba(224,173,68,.16);color:var(--gold);border:1px solid rgba(224,173,68,.4);position:relative}
+  .step.cls .num{background:rgba(70,188,177,.16);color:var(--teal);border-color:rgba(70,188,177,.4)}
+  .step .lbl{font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;font-weight:700;color:var(--txt3);margin-bottom:3px}
+  .step .val{font-size:1.02rem;color:var(--txt);font-weight:500}
+  .step .val b{font-weight:700}
+  .tagpill{display:inline-flex;align-items:center;gap:7px;font-size:.74rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;border-radius:100px;padding:5px 12px;margin-top:4px}
+  .tagpill.proc{background:rgba(70,188,177,.15);color:var(--teal);border:1px solid rgba(70,188,177,.4)}
+  .tagpill.oper{background:rgba(224,173,68,.15);color:var(--gold);border:1px solid rgba(224,173,68,.4)}
+  .tagpill.mix{background:rgba(255,255,255,.07);color:var(--txt);border:1px solid var(--line)}
+
+  .result{border-radius:16px;padding:24px;background:linear-gradient(135deg,rgba(224,173,68,.12),rgba(70,188,177,.08));border:1px solid rgba(224,173,68,.35);
+    opacity:0;transform:translateY(16px);transition:.6s var(--ease)}
+  .result.show{opacity:1;transform:none}
+  .result .rh{font-family:var(--serif);font-size:1.4rem;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+  .result .rh .chk{width:26px;height:26px;border-radius:50%;background:var(--teal);display:grid;place-items:center;flex:none}
+  .result .rh .chk svg{width:15px;height:15px}
+  .result .plan{color:var(--txt2);font-size:.98rem;margin-bottom:18px}
+  .result .metrics{display:flex;gap:28px;flex-wrap:wrap}
+  .metric .k{font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--txt3);font-weight:700;margin-bottom:3px}
+  .metric .v{font-family:var(--serif);font-size:1.7rem;font-weight:700;color:var(--gold)}
+  .metric .v.teal{color:var(--teal)}
+  .disclaimer{font-size:.74rem;color:var(--txt3);font-style:italic;margin-top:16px}
+
+  /* ===== KPI DASHBOARD ===== */
+  .kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:34px}
+  .kpi{position:relative;border:1px solid var(--line);border-radius:var(--r);padding:26px 26px 24px;background:var(--card);overflow:hidden;transition:.4s}
+  .kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(var(--gold),var(--gold-deep))}
+  .kpi.teal::before{background:linear-gradient(var(--teal),var(--teal-deep))}
+  .kpi:hover{transform:translateY(-6px);background:var(--card2);border-color:rgba(224,173,68,.4)}
+  .kpi .top{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+  .kpi .big{font-family:var(--serif);font-weight:700;font-size:3rem;line-height:1;color:var(--gold)}
+  .kpi.teal .big{color:var(--teal)}
+  .kpi .unit{font-family:var(--serif);font-size:1.3rem;color:var(--txt2);font-weight:600}
+  .kpi h4{font-family:var(--sans);font-weight:700;font-size:1.02rem;margin:14px 0 5px;color:var(--txt)}
+  .kpi p{color:var(--txt3);font-size:.9rem}
+  .kpi .save{display:inline-block;margin-top:12px;font-size:.78rem;font-weight:700;color:var(--gold);background:rgba(224,173,68,.13);border:1px solid rgba(224,173,68,.35);border-radius:100px;padding:6px 13px}
+  .kpi .track{margin-top:16px;height:7px;border-radius:100px;background:rgba(255,255,255,.07);overflow:hidden}
+  .kpi .track .pf{height:100%;width:0;border-radius:100px;background:linear-gradient(90deg,var(--gold),var(--gold-deep));transition:width 1.4s var(--ease)}
+  .kpi.teal .track .pf{background:linear-gradient(90deg,var(--teal),var(--teal-deep))}
+  .kpi .tlabels{display:flex;justify-content:space-between;margin-top:7px;font-family:var(--mono);font-size:.66rem;color:var(--txt3)}
+
+  /* ===== CALCULATOR ===== */
+  .calc{border:1px solid var(--line);border-radius:24px;background:var(--glass);backdrop-filter:blur(12px);padding:34px;margin-top:34px;box-shadow:0 30px 80px rgba(0,0,0,.4);
+    display:grid;grid-template-columns:1.05fr 1fr;gap:38px;align-items:center}
+  @media(max-width:900px){.calc{grid-template-columns:1fr;gap:28px;padding:24px}}
+  .calc .ctrl{display:grid;gap:26px}
+  .calc .field .flab{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:11px}
+  .calc .field .flab .name{font-size:.82rem;font-weight:700;letter-spacing:.04em;color:var(--txt2)}
+  .calc .field .flab .num{font-family:var(--serif);font-size:1.5rem;font-weight:700;color:var(--gold)}
+  .calc .field .flab .num.teal{color:var(--teal)}
+  .calc input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:100px;background:rgba(255,255,255,.1);outline:none}
+  .calc input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:22px;border-radius:50%;cursor:pointer;
+    background:linear-gradient(135deg,var(--gold),var(--gold-deep));box-shadow:0 4px 14px rgba(224,173,68,.5);border:2px solid rgba(255,255,255,.12)}
+  .calc input[type=range]::-moz-range-thumb{width:22px;height:22px;border:2px solid rgba(255,255,255,.12);border-radius:50%;cursor:pointer;background:var(--gold)}
+  .calc input[type=range].teal::-webkit-slider-thumb{background:linear-gradient(135deg,var(--teal),var(--teal-deep));box-shadow:0 4px 14px rgba(70,188,177,.5)}
+  .calc .frange{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.66rem;color:var(--txt3);margin-top:8px}
+  .calc .readout{border:1px solid rgba(224,173,68,.3);border-radius:18px;padding:30px;background:linear-gradient(150deg,rgba(224,173,68,.1),rgba(70,188,177,.06));text-align:center}
+  .calc .readout .rk{font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;font-weight:700;color:var(--txt3);margin-bottom:8px}
+  .calc .readout .rbig{font-family:var(--serif);font-weight:700;font-size:clamp(2.6rem,6vw,3.8rem);line-height:1;color:var(--gold);letter-spacing:-1px}
+  .calc .readout .rsub{color:var(--txt2);font-size:.92rem;margin-top:12px}
+  .calc .readout .split{display:flex;gap:0;margin-top:22px;border-top:1px solid var(--line);padding-top:18px}
+  .calc .readout .split div{flex:1;border-left:1px solid var(--line)}
+  .calc .readout .split div:first-child{border-left:none}
+  .calc .readout .split .sk{font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--txt3);font-weight:700;margin-bottom:4px}
+  .calc .readout .split .sv{font-family:var(--serif);font-size:1.5rem;font-weight:700;color:var(--teal)}
+  .calc .disc{font-size:.72rem;color:var(--txt3);font-style:italic;margin-top:16px;grid-column:1/-1}
+
+  /* ===== AGENDA ===== */
+  .agenda{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:34px}
+  .acard{border:1px solid var(--line);border-radius:var(--r);padding:28px;background:var(--card);position:relative;overflow:hidden;transition:.4s}
+  .acard::after{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:linear-gradient(90deg,var(--gold),var(--teal));transform:scaleX(0);transform-origin:left;transition:.5s}
+  .acard:hover{transform:translateY(-6px);background:var(--card2)}
+  .acard:hover::after{transform:scaleX(1)}
+  .acard .ic{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;background:rgba(70,188,177,.13);color:var(--teal);margin-bottom:16px}
+  .acard .ic svg{width:24px;height:24px}
+  .acard h4{font-family:var(--serif);font-size:1.4rem;font-weight:600;margin-bottom:8px}
+  .acard p{color:var(--txt3);font-size:.94rem}
+
+  /* ===== CLOSE ===== */
+  .close-card{border:1px solid rgba(224,173,68,.4);border-radius:24px;padding:48px;background:linear-gradient(150deg,rgba(26,34,80,.7),rgba(8,13,38,.7));margin-top:30px;position:relative;overflow:hidden}
+  .close-card::before{content:"";position:absolute;top:-60px;right:-60px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(224,173,68,.18),transparent 70%)}
+  .close-card h2{font-size:clamp(1.9rem,3.6vw,2.7rem)}
+  .ask{display:flex;gap:18px;align-items:flex-start;margin-top:28px;border-top:1px solid var(--line);padding-top:28px;position:relative}
+  .ask .ic{flex:none;width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:rgba(224,173,68,.16);color:var(--gold)}
+  .ask .ic svg{width:22px;height:22px}
+  .ask h4{font-family:var(--serif);font-size:1.4rem;color:var(--gold);font-weight:600;margin-bottom:4px}
+  .ask p{color:var(--txt2)}
+
+  footer{padding:46px 0 64px;text-align:center;color:var(--txt3);font-size:.82rem;border-top:1px solid var(--line)}
+  footer .fbrand{font-family:var(--serif);font-size:1.05rem;color:var(--txt2);margin-bottom:6px}
+
+  @media(max-width:900px){
+    .three,.agenda{grid-template-columns:1fr}
+    .kpis{grid-template-columns:1fr}
+    section{padding:74px 0}
+    .rail .rstep .rt{display:none}
+  }
+  @media(max-width:600px){
+    .wrap{padding:0 18px}
+    section{padding:56px 0}
+    .hero{min-height:auto;padding-top:96px;padding-bottom:40px}
+    .hero h1{font-size:2.4rem;margin:20px 0 16px}
+    .cta-row{margin-top:26px}
+    .btn{width:100%;justify-content:center;padding:14px 20px}
+    .hero-meta{margin-top:40px;flex-direction:column;gap:16px}
+    .hero-meta .hm{padding:0;border-left:none}
+    h2{font-size:1.8rem}
+    .org-ctl{width:100%}.org-ctl button{flex:1}
+    .arms{grid-template-columns:1fr;gap:0}
+    .arms::before{display:none}
+    .acell{padding-top:0;margin-top:22px}
+    .acell::before{display:none}
+    .acell:first-child{margin-top:0}
+    .orgflow.hoy .acell{margin-top:22px}
+    .onode{width:100%;min-width:0;max-width:none;display:block}
+    .org-detail{position:relative;top:0}
+    .sim,.calc{padding:18px;border-radius:18px}
+    .stage{padding:6px}
+    .step{padding:13px 14px;gap:12px}
+    .result{padding:18px}
+    .result .metrics{gap:16px}
+    .metric .v{font-size:1.4rem}
+    .kpi .big{font-size:2.5rem}
+    .close-card{padding:26px;border-radius:18px}
+    .ask{flex-direction:column;gap:12px}
+  }
+</style>
+</head>
+<body>
+
+<div class="bg"><div class="orb a"></div><div class="orb b"></div></div>
+<div class="grid"></div>
+<canvas id="stars"></canvas>
+<div class="progress" id="prog"></div>
+
+<!-- TOPBAR -->
+<div class="topbar" id="topbar">
+  <a href="#top" class="brand"><span class="mk">T</span><span>TCoE<span class="sub"> · Gobierno</span></span></a>
+  <nav class="tnav" id="tnav">
+    <a href="#evolucion">Evolución</a>
+    <a href="#modelo">Modelo</a>
+    <a href="#sim">Simulador</a>
+    <a href="#metas">Metas</a>
+    <a href="#impacto">Impacto</a>
+  </nav>
+  <a href="#cierre" class="tcta">La solicitud →</a>
+</div>
+
+<!-- SIDE DOTS -->
+<nav class="dots" id="dots"></nav>
+
+<!-- HERO -->
+<section class="hero wrap" id="top" data-screen-label="Hero" data-dot="Inicio">
+  <span class="tag"><span class="dot"></span>Simulación · Comité de Arquitectura Organizacional</span>
+  <h1>Evolución del modelo de <span class="em">gobierno del TCoE</span></h1>
+  <p class="sub">Una simulación interactiva para el comité: cómo un solo mando sobre los dos brazos —procesos y operación— permite gobernar los sobrecostos <b>(ARCs)</b> y acelerar la transformación.</p>
+  <div class="cta-row">
+    <a href="#sim" class="btn primary">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+      Ejecutar el simulador de ARCs
+    </a>
+    <a href="#evolucion" class="btn ghost">Ver el recorrido</a>
+  </div>
+  <div class="hero-meta">
+    <div class="hm">
+      <div class="k">Meta de ARCs</div>
+      <div class="v"><span class="g" data-count="-20" data-suffix="%">0%</span> <span style="font-size:1rem;color:var(--txt3)">en el año</span></div>
+    </div>
+    <div class="hm">
+      <div class="k">Ahorro estimado</div>
+      <div class="v">≈ $<span class="g" data-count="24">0</span> M</div>
+    </div>
+    <div class="hm">
+      <div class="k">Gobierno por</div>
+      <div class="v"><span class="t">el TCoE</span></div>
+    </div>
+  </div>
+  <div class="scrollcue"><span>Desplázate</span><span class="ln"></span></div>
+</section>
+
+<!-- EVOLUCIÓN / TIMELINE -->
+<section id="evolucion" class="wrap" data-screen-label="Evolución" data-dot="Evolución">
+  <div class="eyebrow rv">El punto de evolución</div>
+  <h2 class="rv d1">La separación fue estratégica;<br>la madurez pide <span class="em">gobierno</span></h2>
+  <p class="lead rv d2">Desde su origen el rol acompañó la migración del servicio en todo Grupo Coppel. Recorre la evolución del modelo — toca cada etapa.</p>
+
+  <div class="tl rv d2" id="tl">
+    <div class="tl-track"><div class="fill" id="tlFill"></div></div>
+
+    <div class="tl-step teal" data-step="0">
+      <div class="tl-dot"></div>
+      <div class="tl-yr">Origen · Etapa de migración</div>
+      <div class="tl-h">Una decisión estratégica</div>
+      <div class="tl-body">
+        <p>El rol nació para acompañar la migración del servicio en todo Grupo Coppel. Mantener a gerentes y líderes <em>dentro</em> de las áreas dio cercanía, contexto y tracción inmediata.</p>
+        <span class="badge">Fue la decisión correcta para esa etapa</span>
+      </div>
+    </div>
+
+    <div class="tl-step teal" data-step="1">
+      <div class="tl-dot"></div>
+      <div class="tl-yr">Despliegue · Adopción</div>
+      <div class="tl-h">El modelo se extiende y se estandariza</div>
+      <div class="tl-body">
+        <p>El TCoE define estándares, métricas y el modelo de pruebas. La operación lo adopta vertical por vertical hasta cubrir el ecosistema completo.</p>
+        <span class="badge">Modelo desplegado en todas las verticales</span>
+      </div>
+    </div>
+
+    <div class="tl-step" data-step="2">
+      <div class="tl-dot"></div>
+      <div class="tl-yr">Hoy · Madurez</div>
+      <div class="tl-h">El modelo ya está maduro — y debe gobernarse</div>
+      <div class="tl-body">
+        <p>Con el modelo desplegado y estable, la madurez indica gobernarlo desde el TCoE, sin depender de las áreas de desarrollo que debería supervisar.</p>
+        <span class="badge">La madurez pide gobierno unificado</span>
+      </div>
+    </div>
+
+    <div class="tl-step" data-step="3">
+      <div class="tl-dot"></div>
+      <div class="tl-yr">Propuesta · Lo que se decide hoy</div>
+      <div class="tl-h">Un solo mando sobre los dos brazos</div>
+      <div class="tl-body">
+        <p>Reordenar líneas de reporte —sin headcount nuevo— para que procesos y operación respondan a una misma gobernanza, independiente de las áreas de desarrollo.</p>
+        <span class="badge">Alinear autoridad con responsabilidad</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MODELO / ORG CHART -->
+<section id="modelo" class="wrap" data-screen-label="Modelo organizacional" data-dot="Modelo">
+  <div class="eyebrow teal rv">El núcleo de la propuesta</div>
+  <h2 class="rv d1">Un solo mando sobre los <span class="em">dos brazos</span></h2>
+  <p class="lead rv d2">Sin headcount nuevo: se reordenan líneas de reporte hoy fragmentadas. El TCoE diseña; los gerentes y líderes ejecutan. Compara el modelo de hoy con el modelo gobernado — y toca cada nodo para ver su rol.</p>
+
+  <div class="org-ctl rv d2" id="orgCtl">
+    <button id="bBefore" onclick="setOrg('before')">Modelo de hoy</button>
+    <button id="bAfter" class="on" onclick="setOrg('after')">Modelo gobernado</button>
+  </div>
+
+  <div class="org-stage rv d3">
+    <div class="orgtree" id="orgtree"></div>
+
+    <div class="org-detail" id="orgDetail">
+      <div class="dl">Selecciona un nodo</div>
+      <h4>Coordinación de Gerentes</h4>
+      <p>El mando unificado que gobierna procesos y operación bajo una misma autoridad, independiente de las áreas de desarrollo.</p>
+      <ul>
+        <li>Una sola gobernanza sobre los dos brazos</li>
+        <li>Independiente de las áreas que supervisa</li>
+        <li>Responsable de la meta de ARCs y de la agenda de transformación</li>
+      </ul>
+      <p class="hint">Toca cualquier nodo del organigrama para ver su rol.</p>
+    </div>
+  </div>
+
+  <div class="orgsum rv d3" id="orgSum"></div>
+
+  <div class="three">
+    <div class="tcard rv">
+      <div class="ic">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v18M5 8l7-3 7 3M4 8v8m16-8v8M2 16h6M16 16h6"/></svg>
+      </div>
+      <h4>Captura operativa</h4>
+      <p>Hoy dependen de las áreas de desarrollo que deberían gobernar: juez y parte.</p>
+    </div>
+    <div class="tcard rv d1">
+      <div class="ic">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      </div>
+      <h4>Fragmentación</h4>
+      <p>Cada área aplica el modelo a su manera. Las mejoras no se despliegan homologadas.</p>
+    </div>
+    <div class="tcard rv d2">
+      <div class="ic">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 17H7A5 5 0 017 7h2M15 7h2a5 5 0 010 10h-2M8 12h8"/></svg>
+      </div>
+      <h4>Diagnóstico sin ejecución</h4>
+      <p>El TCoE define el proceso, pero no gobierna su aplicación en campo.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SIMULATOR -->
+<section id="sim" class="wrap" data-screen-label="Simulador de ARCs" data-dot="Simulador">
+  <div class="eyebrow rv">El simulador en vivo</div>
+  <h2 class="rv d1">Gobierno de ARCs: de número reportado a <span class="em">problema corregido</span></h2>
+  <p class="lead rv d2">Hoy los sobrecostos se reportan, pero no se gobiernan. Elige un escenario de ARC y ejecuta el ciclo de gobierno que habilita el mando unificado — paso a paso.</p>
+
+  <div class="sim rv d2">
+    <div class="sim-head">
+      <div>
+        <span class="live"><span class="dot"></span>Ciclo de gobierno</span>
+        <p class="hint">1 · Selecciona un escenario de sobrecosto detectado &nbsp;→&nbsp; 2 · Ejecuta el ciclo de gobierno</p>
+      </div>
+      <div class="ctr">
+        <span class="meta" id="simMeta">Esperando escenario…</span>
+      </div>
+    </div>
+    <div class="chips" id="chips"></div>
+
+    <div class="railwrap">
+      <div class="rail" id="rail">
+        <div class="rstep" data-r="0"><div class="rn">01</div><div class="rt">Monitorear</div><div class="bar"></div></div>
+        <div class="rstep" data-r="1"><div class="rn">02</div><div class="rt">Causa raíz</div><div class="bar"></div></div>
+        <div class="rstep" data-r="2"><div class="rn">03</div><div class="rt">Clasificar</div><div class="bar"></div></div>
+        <div class="rstep" data-r="3"><div class="rn">04</div><div class="rt">Accionar</div><div class="bar"></div></div>
+        <div class="rstep" data-r="4"><div class="rn">05</div><div class="rt">Optimizar</div><div class="bar"></div></div>
+      </div>
+      <div class="stage" id="stage">
+        <div class="empty">
+          <div class="big">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.2"/></svg>
+          </div>
+          Selecciona un escenario para iniciar la simulación del ciclo de gobierno.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- METAS / KPI DASHBOARD -->
+<section id="metas" class="wrap" data-screen-label="Metas / KPIs" data-dot="Metas">
+  <div class="eyebrow rv">Objetivos del modelo gobernado</div>
+  <h2 class="rv d1">Metas que <span class="em">comprometemos</span></h2>
+  <p class="lead rv d2">El gobierno unificado se mide contra objetivos concretos, no contra intenciones. Los contadores avanzan al entrar en pantalla.</p>
+  <div class="kpis" id="kpis">
+    <div class="kpi rv">
+      <div class="top"><span class="big" data-count="-20" data-suffix="">0</span><span class="unit">%</span></div>
+      <h4>Disminución de ARCs en el año</h4>
+      <p>Reducción del sobrecosto del servicio mediante el ciclo de gobierno y los planes de optimización en ambos sentidos.</p>
+      <span class="save">≈ $24 M de ahorro</span>
+      <div class="track"><div class="pf" data-pf="100"></div></div>
+      <div class="tlabels"><span>Hoy</span><span>Meta −20%</span></div>
+    </div>
+    <div class="kpi teal rv d1">
+      <div class="top"><span class="big">4–7</span></div>
+      <h4>NPS del servicio en rango aceptable</h4>
+      <p>Mantener la satisfacción de las áreas atendidas dentro de la banda objetivo de calificación.</p>
+      <div class="track"><div class="pf" data-pf="78"></div></div>
+      <div class="tlabels"><span>Banda objetivo</span><span>Sostenido</span></div>
+    </div>
+    <div class="kpi rv d2">
+      <div class="top"><span class="big" data-count="95" data-suffix="">0</span><span class="unit">%</span></div>
+      <h4>Cumplimiento de planes de automatización</h4>
+      <p>Adicionalmente, <b>90%</b> de cumplimiento en los planes de ejecución de pruebas.</p>
+      <div class="track"><div class="pf" data-pf="95"></div></div>
+      <div class="tlabels"><span>0%</span><span>Meta 95%</span></div>
+    </div>
+    <div class="kpi teal rv d3">
+      <div class="top"><span class="unit" style="font-size:2rem">≥</span><span class="big" data-count="90" data-suffix="">0</span><span class="unit">%</span></div>
+      <h4>Efectividad en contención de defectos críticos</h4>
+      <p>Detener los defectos críticos antes de que lleguen a producción, sostenido en el tiempo.</p>
+      <div class="track"><div class="pf" data-pf="90"></div></div>
+      <div class="tlabels"><span>0%</span><span>Meta ≥90%</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- IMPACTO / CALCULADORA -->
+<section id="impacto" class="wrap" data-screen-label="Calculadora de impacto" data-dot="Impacto">
+  <div class="eyebrow teal rv">Calculadora de impacto</div>
+  <h2 class="rv d1">El tamaño del premio, <span class="em">ajustable</span></h2>
+  <p class="lead rv d2">Mueve los parámetros para dimensionar el ahorro anual que habilita el gobierno unificado de ARCs. Ilustrativo — para alinear el orden de magnitud con el comité.</p>
+
+  <div class="calc rv d2">
+    <div class="ctrl">
+      <div class="field">
+        <div class="flab">
+          <span class="name">Sobrecosto anual base (ARCs)</span>
+          <span class="num" id="lblBase">$120 M</span>
+        </div>
+        <input type="range" id="inBase" min="40" max="240" step="5" value="120" />
+        <div class="frange"><span>$40 M</span><span>$240 M</span></div>
+      </div>
+      <div class="field">
+        <div class="flab">
+          <span class="name">Reducción objetivo con gobierno</span>
+          <span class="num teal" id="lblRed">20%</span>
+        </div>
+        <input type="range" class="teal" id="inRed" min="5" max="35" step="1" value="20" />
+        <div class="frange"><span>5%</span><span>35%</span></div>
+      </div>
+      <div class="field">
+        <div class="flab">
+          <span class="name">Horizonte de captura</span>
+          <span class="num" id="lblYr">12 meses</span>
+        </div>
+        <input type="range" id="inYr" min="6" max="24" step="3" value="12" />
+        <div class="frange"><span>6 m</span><span>24 m</span></div>
+      </div>
+    </div>
+
+    <div class="readout">
+      <div class="rk">Ahorro estimado</div>
+      <div class="rbig" id="outSave">$24.0 M</div>
+      <div class="rsub" id="outSub">Sobre un sobrecosto base de $120 M, una reducción del 20% en 12 meses.</div>
+      <div class="split">
+        <div><div class="sk">Mensual</div><div class="sv" id="outMonth">$2.0 M</div></div>
+        <div><div class="sk">Por punto %</div><div class="sv" id="outPoint">$1.2 M</div></div>
+      </div>
+    </div>
+    <p class="disc">Cifras ilustrativas para dimensionar el orden de magnitud. El compromiso concreto es una meta de −20% de ARCs con trazabilidad por vertical y plan de reducción medible.</p>
+  </div>
+</section>
+
+<!-- AGENDA -->
+<section class="wrap" data-screen-label="Agenda habilitada">
+  <div class="eyebrow teal rv">La agenda que se habilita</div>
+  <h2 class="rv d1">El gobierno unificado <span class="em">acelera</span> la transformación</h2>
+  <p class="lead rv d2">Con un solo mando sobre procesos y operación, el TCoE impulsa de forma transversal:</p>
+  <div class="agenda">
+    <div class="acard rv">
+      <div class="ic">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M12 8V4M9 4h6M8 13h.01M12 13h.01M16 13h.01M8 17h8"/></svg>
+      </div>
+      <h4>Automatización de pruebas</h4>
+      <p>Mayor cobertura automatizada en flujos críticos, reduciendo ejecuciones manuales y costo recurrente.</p>
+    </div>
+    <div class="acard rv d1">
+      <div class="ic">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3a4 4 0 00-4 4v1a3 3 0 00-1 5.8V16a3 3 0 003 3h4a3 3 0 003-3v-2.2A3 3 0 0016 8V7a4 4 0 00-4-4zM12 8v8"/></svg>
+      </div>
+      <h4>Implementación de IA</h4>
+      <p>IA aplicada al diseño de pruebas, análisis de defectos y priorización inteligente de la regresión.</p>
+    </div>
+    <div class="acard rv d2">
+      <div class="ic">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M17 7a6 6 0 00-10 4M7 17a6 6 0 0010-4M7 7v4h4M17 17v-4h-4"/></svg>
+      </div>
+      <h4>Mejora continua</h4>
+      <p>Un ciclo permanente de optimización de proceso y operación, medido y gobernado desde el TCoE.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CLOSE -->
+<section id="cierre" class="wrap" data-screen-label="Cierre / Solicitud" data-dot="La solicitud">
+  <div class="close-card rv">
+    <div class="eyebrow">En síntesis</div>
+    <h2>Alinear <span class="em">autoridad</span> con responsabilidad</h2>
+    <p class="lead" style="max-width:780px">Por la madurez del modelo, el servicio debe gobernarse desde el TCoE y no depender de las áreas de desarrollo. Con un solo mando sobre los dos brazos se impulsan las mejoras, se monitorean los ARCs para optimizar en ambos sentidos y se acelera la automatización, la IA y la mejora continua.</p>
+    <div class="ask">
+      <div class="ic">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 13l4 4L19 7"/></svg>
+      </div>
+      <div>
+        <h4>Solicitud a Arquitectura Organizacional</h4>
+        <p>Validar la creación del rol de Coordinación de Gerentes y la reubicación de los gerentes y líderes de servicio fuera de las áreas de desarrollo, bajo el gobierno del TCoE — iniciando con un piloto acotado y trazabilidad de ARCs a 90 días.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="fbrand">Coordinación de Gerentes — TCoE · Grupo Coppel</div>
+  Simulación ejecutiva · Comité de Arquitectura Organizacional · 2026
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var docEl = document.documentElement;
+
+  /* ===== PROGRESS BAR ===== */
+  var prog = document.getElementById('prog');
+  function onScroll(){
+    var p = docEl.scrollTop / (docEl.scrollHeight - docEl.clientHeight);
+    prog.style.width = (p * 100) + '%';
+    var top = document.getElementById('topbar');
+    if(docEl.scrollTop > 360){
+      top.classList.add('show');
+      document.getElementById('dots').classList.add('show');
+    } else {
+      top.classList.remove('show');
+      document.getElementById('dots').classList.remove('show');
+    }
+  }
+  window.addEventListener('scroll', onScroll, {passive: true});
+
+  /* ===== STARFIELD ===== */
+  (function(){
+    var c = document.getElementById('stars'), x = c.getContext('2d'), stars = [], W, H;
+    function size(){ W = c.width = innerWidth; H = c.height = innerHeight; build(); }
+    function build(){
+      stars = [];
+      var n = Math.min(70, Math.round(W * H / 26000));
+      for(var i = 0; i < n; i++) stars.push({x: Math.random()*W, y: Math.random()*H, r: Math.random()*1.3+.3, a: Math.random()*.5+.2, s: Math.random()*.3+.05});
+    }
+    function draw(){
+      x.clearRect(0, 0, W, H);
+      for(var i = 0; i < stars.length; i++){
+        var st = stars[i];
+        st.y -= st.s;
+        if(st.y < 0) st.y = H;
+        x.beginPath(); x.arc(st.x, st.y, st.r, 0, 7);
+        x.fillStyle = 'rgba(224,200,150,' + st.a + ')';
+        x.fill();
+      }
+      requestAnimationFrame(draw);
+    }
+    size();
+    window.addEventListener('resize', size);
+    draw();
+  })();
+
+  /* ===== REVEAL ===== */
+  var io = new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, {threshold: .14});
+  document.querySelectorAll('.rv').forEach(function(el){ io.observe(el); });
+
+  /* ===== COUNT-UP ===== */
+  function animateCount(el){
+    var target = parseFloat(el.dataset.count), suffix = el.dataset.suffix || '';
+    var neg = target < 0, abs = Math.abs(target), start = null, dur = 1400;
+    function frame(t){
+      if(!start) start = t;
+      var p = Math.min((t - start) / dur, 1);
+      var e = 1 - Math.pow(1 - p, 3), val = Math.round(abs * e);
+      el.textContent = (neg ? '-' : '') + val + suffix;
+      if(p < 1) requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
+  }
+  var cio = new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.isIntersecting){ animateCount(e.target); cio.unobserve(e.target); } });
+  }, {threshold: .5});
+  document.querySelectorAll('[data-count]').forEach(function(el){ cio.observe(el); });
+
+  /* KPI progress bars */
+  var pio = new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.isIntersecting){ e.target.style.width = e.target.dataset.pf + '%'; pio.unobserve(e.target); } });
+  }, {threshold: .5});
+  document.querySelectorAll('.pf').forEach(function(el){ pio.observe(el); });
+
+  /* ===== TIMELINE ===== */
+  (function(){
+    var steps = document.querySelectorAll('#tl .tl-step'), fill = document.getElementById('tlFill');
+    function activate(i){
+      steps.forEach(function(s, j){ s.classList.toggle('on', j === i); });
+      var pct = steps.length > 1 ? (i / (steps.length - 1)) * 100 : 0;
+      fill.style.height = Math.max(8, pct) + '%';
+    }
+    steps.forEach(function(s, i){ s.addEventListener('click', function(){ activate(i); }); });
+    var tio = new IntersectionObserver(function(es){
+      es.forEach(function(e){ if(e.isIntersecting) activate(parseInt(e.target.dataset.step, 10)); });
+    }, {threshold: .6});
+    steps.forEach(function(s){ tio.observe(s); });
+    activate(0);
+  })();
+
+  /* ===== ORG CHART ===== */
+  (function(){
+    var tree = document.getElementById('orgtree'),
+        detail = document.getElementById('orgDetail'),
+        sum = document.getElementById('orgSum');
+
+    var data = {
+      top: {
+        dl: 'Gobierno · TCoE',
+        h: 'Coordinación de Gerentes',
+        p: 'El mando unificado que gobierna procesos y operación bajo una misma autoridad, independiente de las áreas de desarrollo. Alinea ambos brazos hacia un mismo objetivo.',
+        li: ['Una sola gobernanza sobre los dos brazos', 'Independiente de las áreas que supervisa', 'Responsable de la meta de ARCs y de la agenda de transformación'],
+        color: 'gold'
+      },
+      proc: {
+        dl: 'Brazo de procesos · TCoE',
+        h: 'Gerente del TCoE',
+        p: 'Diseña el "cómo": estándares, modelo de pruebas, métricas y mejora continua que se aplican de forma homologada en todas las verticales.',
+        li: ['Define estándares y el modelo de pruebas', 'Mide y gobierna la métrica de ARCs', 'Despliega mejoras de forma homologada'],
+        color: 'teal'
+      },
+      oper: {
+        dl: 'Brazo operativo · Gerentes y líderes',
+        h: 'Gerentes y líderes de servicio',
+        p: 'Aseguran la operación en cada vertical. Bajo el modelo gobernado reportan al TCoE en vez de a las áreas de desarrollo, lo que habilita el monitoreo operativo de ARCs.',
+        li: ['Ejecutan la operación en cada vertical', 'Aplican el modelo definido por el TCoE', 'Reubicados fuera de las áreas de desarrollo'],
+        color: 'gold'
+      },
+      dev: {
+        dl: 'Hoy · línea de reporte',
+        h: 'Áreas de desarrollo',
+        p: 'Hoy el brazo operativo cuelga de las mismas áreas de desarrollo que debería supervisar — juez y parte. El TCoE define el proceso, pero no gobierna su ejecución en campo.',
+        li: ['El operativo reporta a quien debe gobernar', 'Cada área aplica el modelo a su manera', 'Las mejoras no se despliegan homologadas'],
+        color: 'rose'
+      }
+    };
+
+    var afterHTML =
+      '<div class="orgflow after">' +
+        '<div class="orgobj"><span class="pill">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.4"/></svg>' +
+          'Un mando común · ambos brazos hacia el mismo objetivo' +
+        '</span></div>' +
+        '<div class="orghead"><div class="onode top" data-node="top"><div class="lab">Gobierno · TCoE</div><div class="t">Coordinación de Gerentes</div></div></div>' +
+        '<div class="trunk"></div>' +
+        '<div class="arms">' +
+          '<div class="acell"><div class="onode proc" data-node="proc"><div class="lab">Brazo de procesos</div><div class="t">Gerente del TCoE</div><div class="d">Estándares · modelo · métrica · mejora</div><span class="ntag gain">✓ Procesos homologados</span></div></div>' +
+          '<div class="acell"><div class="onode oper" data-node="oper"><div class="lab">Brazo operativo</div><div class="t">Gerentes y líderes</div><div class="d">Operación en cada vertical · bajo el TCoE</div><span class="ntag gain">✓ Monitoreo operativo de ARCs</span></div></div>' +
+        '</div>' +
+      '</div>';
+
+    var hoyHTML =
+      '<div class="orgflow hoy">' +
+        '<div class="orgobj"><span class="pill">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>' +
+          'Sin un mando común · cada brazo persigue su propio objetivo' +
+        '</span></div>' +
+        '<div class="arms">' +
+          '<div class="acell"><div class="onode proc" data-node="proc"><div class="lab">Brazo de procesos</div><div class="t">Gerente del TCoE</div><div class="d">Define el modelo y los estándares…</div><span class="ntag pain">↯ Define, pero no gobierna la ejecución</span></div></div>' +
+          '<div class="acell"><div class="onode dev" data-node="dev"><div class="lab">Hoy reporta a</div><div class="t">Áreas de desarrollo</div></div><div class="vbar"></div><div class="onode oper" data-node="oper"><div class="lab">Brazo operativo</div><div class="t">Gerentes y líderes</div><div class="d">Dentro de las áreas que debería gobernar</div><span class="ntag pain">↯ Capturado · juez y parte</span></div></div>' +
+        '</div>' +
+      '</div>';
+
+    function icon(p){ return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' + p + '</svg>'; }
+    var icGov = icon('<path d="M12 3 4 7v5c0 4 3.5 7 8 9 4.5-2 8-5 8-9V7z"/>'),
+        icHom = icon('<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>'),
+        icMon = icon('<path d="M3 12h4l3 8 4-16 3 8h4"/>'),
+        icCi  = icon('<path d="M17 7a6 6 0 0 0-10 4M7 17a6 6 0 0 0 10-4M7 7v4h4M17 17v-4h-4"/>');
+
+    var sumHoy = [
+      {i: icGov, h: 'Sin gobierno común',      p: 'Los dos brazos operan separados, sin un mando que los alinee hacia un mismo objetivo.'},
+      {i: icHom, h: 'Procesos no homologados', p: 'Cada área aplica el modelo a su manera; las mejoras no se despliegan de forma uniforme.'},
+      {i: icMon, h: 'Monitoreo de ARCs disperso', p: 'El sobrecosto se reporta, pero nadie lo gobierna ni lo corrige operativamente.'}
+    ];
+    var sumAfter = [
+      {i: icHom, h: 'Áreas homologadas',           p: 'El TCoE estandariza procesos y los aplica igual en todas las verticales.'},
+      {i: icMon, h: 'Monitoreo operativo de ARCs',  p: 'Mando unificado para detectar, clasificar y corregir el sobrecosto en campo.'},
+      {i: icCi,  h: 'Mejora continua vía TCoE',     p: 'Un ciclo permanente de optimización de proceso y operación, medido y gobernado.'}
+    ];
+
+    function renderSum(m){
+      var arr = m === 'hoy' ? sumHoy : sumAfter, cls = m === 'hoy' ? 'bad' : 'good';
+      sum.innerHTML = arr.map(function(s){
+        return '<div class="scard ' + cls + '"><div class="sh"><span class="si">' + s.i + '</span>' + s.h + '</div><p>' + s.p + '</p></div>';
+      }).join('');
+    }
+
+    function render(k){
+      var d = data[k]; if(!d) return;
+      var c  = d.color === 'teal' ? 'var(--teal)'  : (d.color === 'rose' ? 'var(--rose)' : 'var(--gold)');
+      var bc = d.color === 'teal' ? 'rgba(70,188,177,.4)' : (d.color === 'rose' ? 'rgba(224,121,95,.4)' : 'rgba(224,173,68,.4)');
+      detail.style.borderColor = bc;
+      detail.innerHTML =
+        '<div class="dl" style="color:' + c + '">' + d.dl + '</div>' +
+        '<h4>' + d.h + '</h4>' +
+        '<p>' + d.p + '</p>' +
+        '<ul>' + d.li.map(function(x){ return '<li>' + x + '</li>'; }).join('') + '</ul>';
+      detail.querySelectorAll('li').forEach(function(li){ li.style.setProperty('--b', c); });
+    }
+
+    function bindNodes(){
+      tree.querySelectorAll('.onode').forEach(function(n){
+        n.addEventListener('click', function(){
+          tree.querySelectorAll('.onode').forEach(function(o){ o.classList.remove('sel'); });
+          n.classList.add('sel');
+          render(n.dataset.node);
+        });
+      });
+    }
+
+    window.setOrg = function(m){
+      var hoy = m === 'hoy' || m === 'before';
+      tree.innerHTML = hoy ? hoyHTML : afterHTML;
+      bindNodes();
+      renderSum(hoy ? 'hoy' : 'after');
+      render(hoy ? 'dev' : 'top');
+      var first = tree.querySelector(hoy ? '.onode.dev' : '.onode.top');
+      if(first) first.classList.add('sel');
+      document.getElementById('bBefore').classList.toggle('on', hoy);
+      document.getElementById('bAfter').classList.toggle('on', !hoy);
+      requestAnimationFrame(function(){ var f = tree.querySelector('.orgflow'); if(f) f.classList.add('show'); });
+    };
+    setOrg('after');
+  })();
+
+  /* ===== SIMULATOR ===== */
+  (function(){
+    var scenarios = [
+      {id: 'amb', label: 'Ambientes inestables', tag: 'Operación',
+        signal: 'Reejecuciones repetidas de una misma suite por ambientes caídos o mal configurados.',
+        cause:  'Falta de readiness de ambiente antes de ejecutar (disponibilidad, datos, conectividad).',
+        type: 'oper', armTitle: 'Brazo operativo · Gerentes y líderes', partner: 'Con Infraestructura y Desarrollo',
+        plan: 'Checklist de readiness obligatorio previo a ejecución y monitoreo de estabilidad de ambientes por vertical.',
+        impactK: 'Reejecuciones', impactV: '↓ Alto', impact2K: 'Causa', impact2V: 'Operativa'},
+      {id: 'reg', label: 'Regresión sobre flujos no críticos', tag: 'Proceso',
+        signal: 'Ejecución de regresión completa, incluyendo flujos de bajo riesgo, en cada entrega.',
+        cause:  'Estrategia de regresión sin priorización por criticidad de negocio.',
+        type: 'proc', armTitle: 'Brazo de procesos · TCoE', partner: 'Con Negocio (definición de flujos críticos)',
+        plan: 'Reenfoque de la regresión a flujos críticos y optimización de la cobertura según riesgo.',
+        impactK: 'Horas de ejecución', impactV: '↓ Medio-Alto', impact2K: 'Causa', impact2V: 'De proceso'},
+      {id: 'hu', label: 'HU ambiguas → retrabajo', tag: 'Ambos',
+        signal: 'Alto retrabajo post-QA por historias de usuario ambiguas o mal definidas.',
+        cause:  'DoD no cumplido en la entrada (proceso) + calidad de la HU desde desarrollo (operación).',
+        type: 'mix', armTitle: 'Ambos brazos · TCoE + operativo', partner: 'Con Desarrollo y Negocio',
+        plan: 'Endurecer el DoD de entrada (proceso) y acordar criterios de calidad de HU con desarrollo (operación).',
+        impactK: 'Ciclos de re-test', impactV: '↓ Alto', impact2K: 'Causa', impact2V: 'Mixta'},
+      {id: 'dem', label: 'Demanda no planeada al cierre', tag: 'Operación',
+        signal: 'Acumulación de demanda no planeada concentrada al final del ciclo, disparando excedentes.',
+        cause:  'Control de demanda débil; entradas sin validación de capacidad.',
+        type: 'oper', armTitle: 'Brazo operativo · Gerentes y líderes', partner: 'Con Negocio (Ventanilla Única)',
+        plan: 'Gobierno de la entrada de demanda con validación de capacidad y nivelación por sprint.',
+        impactK: 'Demanda no planeada', impactV: '↓ Alto', impact2K: 'Causa', impact2V: 'Operativa'},
+      {id: 'man', label: 'Cobertura 100% manual', tag: 'Proceso',
+        signal: 'Pruebas repetitivas ejecutadas manualmente, con costo recurrente creciente.',
+        cause:  'Baja automatización en suites estables y repetibles.',
+        type: 'proc', armTitle: 'Brazo de procesos · TCoE', partner: 'Acelerado con automatización + IA',
+        plan: 'Plan de automatización de suites estables e incorporación de IA al diseño y priorización de pruebas.',
+        impactK: 'Costo recurrente', impactV: '↓ Estructural', impact2K: 'Causa', impact2V: 'De proceso'}
+    ];
+
+    var chips = document.getElementById('chips'),
+        stage = document.getElementById('stage'),
+        rail  = document.getElementById('rail'),
+        meta  = document.getElementById('simMeta');
+    var rsteps = rail.querySelectorAll('.rstep'), timers = [];
+
+    function clearTimers(){ timers.forEach(clearTimeout); timers = []; }
+    function resetRail(){ rsteps.forEach(function(r){ r.classList.remove('done', 'active'); }); }
+
+    scenarios.forEach(function(s){
+      var b = document.createElement('button');
+      b.className = 'chip';
+      b.dataset.id = s.id;
+      b.innerHTML = s.label + ' <span class="tg">' + s.tag + '</span>';
+      b.onclick = function(){
+        document.querySelectorAll('.chip').forEach(function(c){ c.classList.remove('on'); });
+        b.classList.add('on');
+        run(s);
+      };
+      chips.appendChild(b);
+    });
+
+    function typePill(t){
+      if(t === 'proc') return '<span class="tagpill proc">● Palanca de proceso · TCoE</span>';
+      if(t === 'oper') return '<span class="tagpill oper">● Palanca operativa · Gerentes y líderes</span>';
+      return '<span class="tagpill mix">● Ambas palancas · optimización en los dos sentidos</span>';
+    }
+    var chk = '<span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="#04201d" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg></span>';
+
+    function run(s){
+      clearTimers(); resetRail();
+      meta.textContent = 'Escenario: ' + s.label;
+      var steps = [
+        {lbl: '1 · Monitorear',       val: s.signal,  cls: ''},
+        {lbl: '2 · Identificar causa raíz', val: s.cause,   cls: ''},
+        {lbl: '3 · Clasificar',       val: typePill(s.type), cls: 'cls'},
+        {lbl: '4 · Accionar',         val: '<b>' + s.armTitle + '</b><br><span style="color:var(--txt3);font-size:.92rem">' + s.partner + '</span>', cls: ''}
+      ];
+      var html = '';
+      steps.forEach(function(st, i){
+        html += '<div class="step ' + st.cls + '" data-i="' + i + '">' +
+                '<div class="num">' + (i+1) + '</div>' +
+                '<div><div class="lbl">' + st.lbl + '</div><div class="val">' + st.val + '</div></div></div>';
+      });
+      html += '<div class="result" id="resBox">' +
+              '<div class="rh">' + chk + 'Plan de optimización</div>' +
+              '<div class="plan">' + s.plan + '</div>' +
+              '<div class="metrics">' +
+                '<div class="metric"><div class="k">' + s.impactK + '</div><div class="v">' + s.impactV + '</div></div>' +
+                '<div class="metric"><div class="k">' + s.impact2K + '</div><div class="v teal">' + s.impact2V + '</div></div>' +
+                '<div class="metric"><div class="k">Trazabilidad</div><div class="v teal">90 días</div></div>' +
+              '</div>' +
+              '<div class="disclaimer">Impactos ilustrativos. El compromiso concreto es trazabilidad de causa raíz y un plan de reducción medible por vertical.</div>' +
+              '</div>';
+      stage.innerHTML = html;
+
+      var stepEls = stage.querySelectorAll('.step'), gap = 620;
+      stepEls.forEach(function(el, i){
+        timers.push(setTimeout(function(){
+          el.classList.add('show');
+          if(i > 0){ rsteps[i-1].classList.remove('active'); rsteps[i-1].classList.add('done'); }
+          rsteps[i].classList.add('active');
+        }, gap * i + 120));
+      });
+      timers.push(setTimeout(function(){
+        rsteps[3].classList.remove('active'); rsteps[3].classList.add('done');
+        rsteps[4].classList.add('active');
+        var r = document.getElementById('resBox'); if(r) r.classList.add('show');
+      }, gap * stepEls.length + 120));
+      timers.push(setTimeout(function(){
+        rsteps[4].classList.remove('active'); rsteps[4].classList.add('done');
+        meta.textContent = 'Ciclo completado · ' + s.label;
+      }, gap * stepEls.length + 900));
+    }
+  })();
+
+  /* ===== CALCULATOR ===== */
+  (function(){
+    var inBase = document.getElementById('inBase'),
+        inRed  = document.getElementById('inRed'),
+        inYr   = document.getElementById('inYr');
+    var lblBase  = document.getElementById('lblBase'),
+        lblRed   = document.getElementById('lblRed'),
+        lblYr    = document.getElementById('lblYr');
+    var outSave  = document.getElementById('outSave'),
+        outSub   = document.getElementById('outSub'),
+        outMonth = document.getElementById('outMonth'),
+        outPoint = document.getElementById('outPoint');
+    function fmt(n){ return (Math.round(n * 10) / 10).toFixed(1); }
+    function calc(){
+      var base = +inBase.value, red = +inRed.value, yr = +inYr.value;
+      var save  = base * (red / 100);
+      var month = save / yr;
+      var point = base * 0.01;
+      lblBase.textContent  = '$' + base + ' M';
+      lblRed.textContent   = red + '%';
+      lblYr.textContent    = yr + ' meses';
+      outSave.textContent  = '$' + fmt(save) + ' M';
+      outSub.textContent   = 'Sobre un sobrecosto base de $' + base + ' M, una reducción del ' + red + '% en ' + yr + ' meses.';
+      outMonth.textContent = '$' + fmt(month) + ' M';
+      outPoint.textContent = '$' + fmt(point) + ' M';
+    }
+    [inBase, inRed, inYr].forEach(function(el){ el.addEventListener('input', calc); });
+    calc();
+  })();
+
+  /* ===== SIDE DOTS + ACTIVE NAV ===== */
+  (function(){
+    var secs = Array.prototype.slice.call(document.querySelectorAll('section[data-dot]'));
+    var dots = document.getElementById('dots');
+    secs.forEach(function(s){
+      var a = document.createElement('a');
+      a.href = '#' + s.id;
+      a.dataset.l = s.dataset.dot;
+      a.addEventListener('click', function(e){ e.preventDefault(); s.scrollIntoView({behavior: 'smooth', block: 'start'}); });
+      dots.appendChild(a);
+    });
+    var links  = dots.querySelectorAll('a'),
+        tlinks = document.querySelectorAll('#tnav a');
+    var sio = new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        if(e.isIntersecting){
+          var id = e.target.id;
+          links.forEach(function(l){  l.classList.toggle('active',  l.getAttribute('href') === '#' + id); });
+          tlinks.forEach(function(l){ l.classList.toggle('active', l.getAttribute('href') === '#' + id); });
+        }
+      });
+    }, {threshold: .45, rootMargin: '-20% 0px -40% 0px'});
+    secs.forEach(function(s){ sio.observe(s); });
+  })();
+
+  onScroll();
+})();
+</script>
+</body>
+</html>
